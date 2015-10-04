@@ -2,7 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/abc_ab_share_pack_mtrl_alpha"
+        android:icon="@drawable/abc_ic_menu_share_mtrl_alpha"
         android:title="@string/action_share"
         app:showAsAction="ifRoom"/>
+     <item
+        android:id="@+id/action_test"
+        android:title="@string/action_test"
+        app:showAsAction="never"/>
 </menu>
