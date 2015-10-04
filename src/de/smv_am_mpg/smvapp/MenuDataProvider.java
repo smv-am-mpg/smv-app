@@ -133,8 +133,6 @@ public class MenuDataProvider {
 
 		private String downloadUrl(String myurl) throws IOException {
 			InputStream is = null;
-			// Only display the first 500 characters of the retrieved
-			// web page content.
 
 			try {
 				URL url = new URL(myurl);
@@ -151,7 +149,7 @@ public class MenuDataProvider {
 				is = conn.getInputStream();
 
 				// Convert the InputStream into a string
-				String contentAsString = readIt(is);
+				String contentAsString = StreamUtils.streamToString(is);
 				return contentAsString;
 
 				// Makes sure that the InputStream is closed after the app is
@@ -164,19 +162,4 @@ public class MenuDataProvider {
 		}
 	}
 
-	public String readIt(InputStream stream) {
-		Scanner s = null;
-		StringBuilder sb = null;
-		try {
-			s = new Scanner(stream);
-			sb = new StringBuilder(500);
-			while (s.hasNextLine()) {
-				sb.append(s.nextLine());
-			}
-		} finally {
-			s.close();
-
-		}
-		return sb.toString();
-	}
 }
