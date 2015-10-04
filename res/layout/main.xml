@@ -18,14 +18,17 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar">
-        </include>
- 
-        <WebView
-            android:id="@+id/web_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
- 
-    </LinearLayout>
+        </include><android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>
  
  
     <android.support.design.widget.NavigationView

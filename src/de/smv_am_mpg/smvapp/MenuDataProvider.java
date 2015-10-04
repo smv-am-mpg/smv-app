@@ -6,7 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +24,7 @@ public class MenuDataProvider {
 
 	// FIXME THIS SMELLS LIKE HELL...
 	public MenuDataProvider(Main smvApp) {
-		this.navMenu = smvApp.navMenu;
+		this.navMenu = smvApp.mNavMenu;
 		this.smvApp = smvApp;
 	}
 
@@ -89,6 +88,7 @@ public class MenuDataProvider {
 			try {
 				return downloadUrl(urls[0]);
 			} catch (IOException e) {
+				e.printStackTrace();
 				return "Unable to retrieve web page. URL may be invalid.";
 			}
 		}
@@ -99,7 +99,7 @@ public class MenuDataProvider {
 			// Get String
 			// Transform to JSON
 			final ArrayList<MenuItem> menuItems = new ArrayList<>();
-			System.out.println(result);
+			Log.d("DEBUG", "The Http result is: " + result);
 			try {
 				JSONArray mainPages = new JSONArray(result);
 				for (int i = 0; i < mainPages.length(); i++) {
@@ -133,7 +133,6 @@ public class MenuDataProvider {
 
 		private String downloadUrl(String myurl) throws IOException {
 			InputStream is = null;
-
 			try {
 				URL url = new URL(myurl);
 				HttpURLConnection conn = (HttpURLConnection) url
@@ -145,11 +144,11 @@ public class MenuDataProvider {
 				// Starts the query
 				conn.connect();
 				int response = conn.getResponseCode();
-				Log.d("DEBUG", "The response is: " + response);
-				is = conn.getInputStream();
-
+				Log.d("DEBUG", "The Http connection response of " + myurl
+						+ " is: " + response);
 				// Convert the InputStream into a string
-				String contentAsString = StreamUtils.streamToString(is);
+				String contentAsString = StreamUtils.streamToString(conn
+						.getInputStream());
 				return contentAsString;
 
 				// Makes sure that the InputStream is closed after the app is

@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,9 +26,10 @@ import android.webkit.WebViewClient;
 public class Main extends AppCompatActivity {
 	private static final String HOST = "www.smv-am-mpg.de";
 	private DrawerLayout mDrawerLayout;
-	public NavigationView navMenu;
+	public NavigationView mNavMenu;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private WebView contentWebView;
+	private SwipeRefreshLayout mSwipeRefresh;
 
 	private CharSequence initialTitle = "SmV am MPG";
 	private MenuDataProvider menuDataProvider;
@@ -35,16 +38,26 @@ public class Main extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		// Init Toolbar
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setTitle(initialTitle);
+
+		// Init WebView
 		contentWebView = (WebView) findViewById(R.id.web_view);
 		contentWebView.setBackgroundColor(Color.TRANSPARENT);
 		// avoids opening links in a separate browser tab and
 		// makes it possible to send mails with an installed mailing-app
 		contentWebView.setWebViewClient(new WebViewClient() {
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				super.onPageFinished(view, url);
+				mSwipeRefresh.setRefreshing(false);
+			}
+
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
 				if (url.startsWith("mailto:")) {
 					Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse(url));
@@ -65,12 +78,39 @@ public class Main extends AppCompatActivity {
 				}
 			}
 		});
+
+		// Init SwipeRefresh
+		mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+		mSwipeRefresh.setColorSchemeResources(R.color.primary_color);
+		mSwipeRefresh.setOnRefreshListener(new OnRefreshListener() {
+
+			@Override
+			public void onRefresh() {
+				Main.this.contentWebView.reload();
+
+			}
+		});
+
+		// Init DrawerLayout aka the menu
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		navMenu = (NavigationView) findViewById(R.id.nav_menu);
-		navMenu.setNavigationItemSelectedListener(new NavigationItemClickListener());
-		// mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
+		// Add drawer toogle aka the "hamburger" icon
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+				R.string.drawer_close, R.string.drawer_open) {
+			public void onDrawerClosed(View view) {
+				supportInvalidateOptionsMenu();
+			}
+
+			public void onDrawerOpened(View drawerView) {
+				supportInvalidateOptionsMenu();
+			}
+		};
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		mNavMenu = (NavigationView) findViewById(R.id.nav_menu);
+		mNavMenu.setNavigationItemSelectedListener(new NavigationItemClickListener());
+		// mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
 		/*
 		 * mDrawerList .setAdapter(new
 		 * ArrayAdapter<de.smv_am_mpg.smvapp.MenuDataProvider.MenuItem>( this,
@@ -86,20 +126,6 @@ public class Main extends AppCompatActivity {
 			menuDataProvider.getMenuItems();
 		}
 
-		// Fgt den Navigation Drawer zur ActionBar hinzu
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.string.drawer_close, R.string.drawer_open) {
-			public void onDrawerClosed(View view) {
-				// getSupportActionBar().setTitle(mTitle);
-				supportInvalidateOptionsMenu();
-			}
-
-			public void onDrawerOpened(View drawerView) {
-				// getSupportActionBar().setTitle(R.string.app_name);
-				supportInvalidateOptionsMenu();
-			}
-		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
 	@Override
@@ -110,27 +136,19 @@ public class Main extends AppCompatActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	// Versteckt die ActionBar-Eintrge, sobald der Drawer ausgefahren is
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(navMenu);
-		// menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
-		return super.onPrepareOptionsMenu(menu);
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// ffnet und schliet den Navigation Drawer bei Klick auf den Titel/das
-		// Icon in der ActionBar
+		// Opens and closes the drawer if you click the home button
+		// Pretty useless, because the home button is hidden by the drawer
 		if (item.getItemId() == android.R.id.home) {
-			if (mDrawerLayout.isDrawerOpen(navMenu)) {
-				mDrawerLayout.closeDrawer(navMenu);
+			if (mDrawerLayout.isDrawerOpen(mNavMenu)) {
+				mDrawerLayout.closeDrawer(mNavMenu);
 			} else {
-				mDrawerLayout.openDrawer(navMenu);
+				mDrawerLayout.openDrawer(mNavMenu);
 			}
 		}
 
-		// Gibt den ActionBar-Buttons Funktionen
+		// Give functionality to the ActionBar items
 		switch (item.getItemId()) {
 		case R.id.action_share:
 			shareText("Schau dir" + "test" + "an");
@@ -145,13 +163,10 @@ public class Main extends AppCompatActivity {
 		@Override
 		public boolean onNavigationItemSelected(MenuItem menuItem) {
 			getSupportActionBar().setTitle(menuItem.getTitle());
-			System.out.println(menuDataProvider.getMenuItemById(menuItem
-					.getItemId()));
+			mSwipeRefresh.setRefreshing(true);
 			contentWebView.loadUrl(PageDataProvider
 					.getContentUrlFromId(menuItem.getItemId()));
-			System.out.println(PageDataProvider.getContentUrlFromId(menuItem
-					.getItemId()));
-			mDrawerLayout.closeDrawer(navMenu);
+			mDrawerLayout.closeDrawer(mNavMenu);
 			return false;
 		}
 	}
