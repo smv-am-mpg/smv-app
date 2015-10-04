@@ -102,7 +102,6 @@ public class Main extends AppCompatActivity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
-	// Fgt das Men hinzu / ActionBar Eintrge
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
@@ -133,6 +132,9 @@ public class Main extends AppCompatActivity {
 
 		// Gibt den ActionBar-Buttons Funktionen
 		switch (item.getItemId()) {
+		case R.id.action_share:
+			shareText("Schau dir" + "test" + "an");
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -174,6 +176,15 @@ public class Main extends AppCompatActivity {
 		} else {
 			return false;
 		}
+	}
+
+	protected void shareText(CharSequence stringToShare) {
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, stringToShare);
+		sendIntent.setType("text/plain");
+		startActivity(Intent.createChooser(sendIntent,
+				getResources().getText(R.string.share_title)));
 	}
 
 }
