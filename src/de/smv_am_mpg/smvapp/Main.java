@@ -23,6 +23,10 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.parse.Parse;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+
 public class Main extends AppCompatActivity {
 	private static final String HOST = "www.smv-am-mpg.de";
 	private DrawerLayout mDrawerLayout;
@@ -38,6 +42,10 @@ public class Main extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		Parse.initialize(this, "1aBJyf0oXUSrEKqDndGZYHFm3SnwUnXsMqN7PhyM",
+				"8NL6rHsi5Nh7hQVLB6smRoJRZqCOpwZVVnR6uBno");
+		ParseInstallation.getCurrentInstallation().saveInBackground();
+		ParsePush.subscribeInBackground("news");
 
 		// Init Toolbar
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
