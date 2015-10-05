@@ -42,8 +42,6 @@ public class Main extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Parse.initialize(this, "1aBJyf0oXUSrEKqDndGZYHFm3SnwUnXsMqN7PhyM",
-				"8NL6rHsi5Nh7hQVLB6smRoJRZqCOpwZVVnR6uBno");
 		ParseInstallation.getCurrentInstallation().saveInBackground();
 		ParsePush.subscribeInBackground("news");
 
