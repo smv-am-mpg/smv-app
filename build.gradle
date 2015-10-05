@@ -1,10 +1,10 @@
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'com.android.tools.build:gradle:1.2.+'
-  }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.+'
+    }
 }
 
 apply plugin: 'android'
@@ -12,22 +12,33 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
+configurations.create('aar')
+//Add all dependencies that are .aar files here
+configurations.aar {
+    dependencies {
+        compile 'com.android.support:support-v4:22.2.1'
+        compile 'com.android.support:appcompat-v7:22.2.1'
+        compile 'com.android.support:design:22.2.1'
+    }
+}
+
+//Add all "normal" dependencies here AND ALSO the .aar files dependencies!
 dependencies {
-  compile 'com.android.support:support-v4:22.2.1'
-  compile 'com.android.support:appcompat-v7:22.2.1'
-  compile 'com.android.support:design:22.2.1'
-  compile 'com.parse.bolts:bolts-android:1.+'
-  compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:design:22.2.1'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
 }
 
 android {
-  compileSdkVersion 23
-  buildToolsVersion '23.0.1'
-  
-  defaultConfig {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+
+    defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
     }
@@ -42,13 +53,11 @@ android {
             assets.srcDirs = ['assets']
         }
     }
-    
+
     lintOptions {
-          abortOnError false
-      }
+        abortOnError false
+    }
 }
-
-
 
 // sets up the Android Eclipse project, using the old Ant based build.
 eclipse {
@@ -66,8 +75,9 @@ eclipse {
     }
 
     classpath {
-       plusConfigurations += [ project.configurations.compile ]
-        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES' 
+        plusConfigurations += [project.configurations.compile]
+        minusConfigurations += [project.configurations.aar.dependencies]
+        containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
     }
 
     project {
@@ -85,7 +95,7 @@ eclipse {
 idea {
     module {
         sourceDirs += file("src");
-        scopes = [ COMPILE: [plus:[project.configurations.compile]]]        
+        scopes = [COMPILE: [plus: [project.configurations.compile]]]
 
         iml {
             withXml {
@@ -95,7 +105,7 @@ idea {
                 builder.component(name: "FacetManager") {
                     facet(type: "android", name: "Android") {
                         configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value:"true")
+                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
                         }
                     }
                 }
