@@ -11,7 +11,9 @@ build/
 .idea/
 *.iml
 bin/
+gen/
 gradle/wrapper
 lint.xml
 gradlew
 gradlew.bat
+/project.properties
