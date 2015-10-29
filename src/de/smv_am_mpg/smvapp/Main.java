@@ -39,8 +39,22 @@ public class Main extends AppCompatActivity {
 	private MenuDataProvider menuDataProvider;
 
 	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		super.onNewIntent(intent);
+		System.out.println("sdfsdf" + intent.getData());
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+        contentWebView.saveState(outState);	
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.main);
 		ParseInstallation.getCurrentInstallation().saveInBackground();
 		ParsePush.subscribeInBackground("news");
@@ -54,6 +68,7 @@ public class Main extends AppCompatActivity {
 
 		// Init WebView
 		contentWebView = (WebView) findViewById(R.id.web_view);
+		contentWebView.restoreState(savedInstanceState);
 		contentWebView.setBackgroundColor(Color.TRANSPARENT);
 		// avoids opening links in a separate browser tab and
 		// makes it possible to send mails with an installed mailing-app
@@ -84,7 +99,14 @@ public class Main extends AppCompatActivity {
 				}
 			}
 		});
-		contentWebView.loadUrl("http://www.smv-am-mpg.de/");
+		if (getIntent().getData() != null) {
+			contentWebView.loadUrl(getIntent().getData().toString());
+		} else {
+			//contentWebView.loadUrl("http://www.smv-am-mpg.de/");
+			if (contentWebView.getUrl() == null) {
+				contentWebView.loadUrl("http://www.smv-am-mpg.de/");
+			}
+		}
 
 		// Init SwipeRefresh
 		mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -158,7 +180,7 @@ public class Main extends AppCompatActivity {
 		// Give functionality to the ActionBar items
 		switch (item.getItemId()) {
 		case R.id.action_share:
-			shareText("Schau dir" + "test" + "an");
+			shareText("Schau mal hier: " +contentWebView.getUrl());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
