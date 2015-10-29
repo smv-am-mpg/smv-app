@@ -84,6 +84,7 @@ public class Main extends AppCompatActivity {
 				}
 			}
 		});
+		contentWebView.loadUrl("http://www.smv-am-mpg.de/");
 
 		// Init SwipeRefresh
 		mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
