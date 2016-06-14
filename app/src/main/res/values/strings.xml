@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SMV-App</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_share">Teilen</string>
+    <string name="action_test">Test Aktion</string>
+    <string name="share_title">Teilen mit…</string>
+</resources>
